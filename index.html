@@ -1,0 +1,1958 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#12061f" />
+  <title>LW - Love Widget</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+:root {
+  --accent: #ff4d8d;
+  --accent-2: #7c3cff;
+  --cyan: #4df3ff;
+  --text: #ffffff;
+  --muted: rgba(255, 255, 255, 0.72);
+  --soft: rgba(255, 255, 255, 0.12);
+  --line: rgba(255, 255, 255, 0.16);
+  --shadow: rgba(9, 3, 22, 0.45);
+  --panel: rgba(18, 10, 32, 0.72);
+  --panel-strong: rgba(18, 10, 32, 0.92);
+  --menu-bg: #fff7fb;
+  --menu-text: #1a1024;
+  --menu-muted: #6f607a;
+  --radius-xl: 32px;
+  --radius-lg: 24px;
+  --radius-md: 18px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  min-height: 100%;
+  background: #07020d;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  overflow-x: hidden;
+  background: #07020d;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+}
+
+.app-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  background: linear-gradient(135deg, #ff4d8d 0%, #7c3cff 42%, #121632 68%, #4df3ff 100%);
+  background-size: 260% 260%;
+  animation: bgFlow 18s ease-in-out infinite;
+}
+
+.app-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(255, 255, 255, 0.26), transparent 24%),
+    radial-gradient(circle at 76% 12%, rgba(77, 243, 255, 0.2), transparent 28%),
+    radial-gradient(circle at 50% 82%, rgba(255, 77, 141, 0.3), transparent 32%),
+    linear-gradient(180deg, rgba(5, 0, 11, 0.18), rgba(5, 0, 11, 0.78));
+}
+
+.noise {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  opacity: 0.13;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='.9'/%3E%3C/svg%3E");
+}
+
+@keyframes bgFlow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.app {
+  width: min(440px, 100%);
+  margin: 0 auto;
+  padding: calc(18px + var(--safe-top)) 18px calc(36px + var(--safe-bottom));
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.18);
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: white;
+  font-weight: 900;
+  font-size: 13px;
+  letter-spacing: -0.04em;
+}
+
+.brand-text {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.icon-btn {
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: white;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.13);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+  transition: transform .18s ease, background .18s ease;
+}
+
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
+.icon-btn.dark {
+  color: var(--menu-text);
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: none;
+}
+
+.glass {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 28px 80px var(--shadow);
+}
+
+.hero-card {
+  border-radius: var(--radius-xl);
+  padding: 22px 18px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.avatars {
+  display: grid;
+  grid-template-columns: 1fr 58px 1fr;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.avatar-wrap {
+  min-width: 0;
+  background: transparent;
+  color: white;
+}
+
+.avatar {
+  width: 92px;
+  height: 92px;
+  margin: 0 auto 8px;
+  display: block;
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.28), rgba(255,255,255,.08)),
+    radial-gradient(circle at 50% 32%, var(--accent), var(--accent-2));
+  background-size: cover;
+  background-position: center;
+  border: 3px solid rgba(255, 255, 255, 0.86);
+  box-shadow: 0 12px 34px rgba(0,0,0,.28), 0 0 0 8px rgba(255, 255, 255, .08);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar::after {
+  content: "+";
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: white;
+  background: var(--accent);
+  font-weight: 900;
+  box-shadow: 0 8px 20px rgba(0,0,0,.26);
+}
+
+.avatar-label {
+  display: block;
+  max-width: 120px;
+  margin: 0 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 800;
+  opacity: .9;
+}
+
+.heart-core {
+  width: 58px;
+  height: 58px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 255, 255, .22), rgba(255, 255, 255, .06));
+  box-shadow: 0 0 34px rgba(255, 77, 141, .36);
+}
+
+.heart-core span {
+  font-size: 28px;
+  filter: drop-shadow(0 0 18px rgba(255, 77, 141, .85));
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+.couple-title {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  margin-bottom: 6px;
+}
+
+.date-line {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.days-card {
+  border-radius: var(--radius-xl);
+  padding: 26px 18px 18px;
+  margin-bottom: 16px;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.days-card::before {
+  content: "";
+  position: absolute;
+  inset: -50% -20% auto;
+  height: 180px;
+  background: radial-gradient(circle, rgba(255,255,255,.18), transparent 60%);
+  pointer-events: none;
+}
+
+.card-kicker,
+.section-kicker {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.days-number {
+  font-size: clamp(76px, 22vw, 112px);
+  line-height: .9;
+  font-weight: 950;
+  letter-spacing: -0.08em;
+  text-shadow: 0 12px 38px rgba(0,0,0,.26);
+}
+
+.days-label {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.mini-stats div {
+  padding: 12px 8px;
+  border-radius: 18px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.12);
+}
+
+.mini-stats span {
+  display: block;
+  font-size: 20px;
+  font-weight: 950;
+}
+
+.mini-stats small {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.next-card {
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 22px;
+}
+
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.section-head.compact {
+  margin-bottom: 14px;
+}
+
+.section-head h2 {
+  margin: 4px 0 0;
+  font-size: 21px;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.pill {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.12);
+  overflow: hidden;
+  margin: 14px 0 12px;
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), var(--cyan));
+  box-shadow: 0 0 18px rgba(77, 243, 255, .42);
+  transition: width .35s ease;
+}
+
+.next-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.timeline-section {
+  padding-bottom: 26px;
+}
+
+.small-btn {
+  padding: 10px 12px;
+  border-radius: 999px;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.filters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 6px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255,255,255,.08);
+  margin-bottom: 12px;
+}
+
+.filter {
+  padding: 10px 8px;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.filter.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255,255,255,.22), rgba(255,255,255,.1));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.1);
+}
+
+.timeline {
+  display: grid;
+  gap: 10px;
+}
+
+.event-card {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 68px;
+  padding: 12px;
+  border-radius: 20px;
+  background: rgba(255,255,255,.1);
+  border: 1px solid rgba(255,255,255,.13);
+  backdrop-filter: blur(16px);
+}
+
+.event-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(255, 77, 141, .9), rgba(124, 60, 255, .9));
+  box-shadow: 0 12px 26px rgba(0,0,0,.22);
+}
+
+.event-title {
+  font-size: 14px;
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.event-date {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.event-count {
+  text-align: right;
+  font-size: 13px;
+  font-weight: 950;
+  color: #fff;
+}
+
+.event-card.past {
+  opacity: .58;
+}
+
+.event-card.past .event-icon {
+  filter: grayscale(.35);
+}
+
+.empty-state {
+  margin-top: 16px;
+  padding: 28px 16px;
+  text-align: center;
+  border-radius: 24px;
+  background: rgba(255,255,255,.08);
+  color: var(--muted);
+}
+
+.empty-state div {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.hidden-input {
+  position: fixed;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.drawer {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.drawer.open {
+  pointer-events: auto;
+}
+
+.drawer-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, .38);
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+
+.drawer.open .drawer-backdrop {
+  opacity: 1;
+}
+
+.drawer-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: calc(92vh - var(--safe-top));
+  width: min(460px, 100%);
+  margin: 0 auto;
+  padding: 10px 18px calc(22px + var(--safe-bottom));
+  overflow: auto;
+  color: var(--menu-text);
+  background: var(--menu-bg);
+  border-radius: 30px 30px 0 0;
+  transform: translateY(104%);
+  transition: transform .28s cubic-bezier(.2,.9,.2,1);
+  box-shadow: 0 -26px 90px rgba(0,0,0,.4);
+}
+
+.drawer.open .drawer-panel {
+  transform: translateY(0);
+}
+
+body.dark-menu .drawer-panel {
+  --menu-bg: #120b1e;
+  --menu-text: #ffffff;
+  --menu-muted: rgba(255,255,255,.68);
+}
+
+.drawer-handle {
+  width: 44px;
+  height: 5px;
+  margin: 0 auto 14px;
+  border-radius: 999px;
+  background: rgba(120, 103, 130, .32);
+}
+
+.drawer-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.drawer-head h2 {
+  margin: 3px 0 0;
+  font-size: 26px;
+  letter-spacing: -.05em;
+}
+
+.tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  padding: 5px;
+  border-radius: 17px;
+  background: rgba(0, 0, 0, .06);
+  margin-bottom: 16px;
+}
+
+body.dark-menu .tabs {
+  background: rgba(255,255,255,.08);
+}
+
+.tab {
+  padding: 10px 6px;
+  border-radius: 13px;
+  background: transparent;
+  color: var(--menu-muted);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.tab.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 10px 22px rgba(255, 77, 141, .24);
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+  animation: panelIn .18s ease both;
+}
+
+@keyframes panelIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.field {
+  display: block;
+  margin-bottom: 14px;
+}
+
+.field > span {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--menu-muted);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.field small {
+  display: block;
+  margin-top: 7px;
+  color: var(--menu-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid rgba(0, 0, 0, .1);
+  border-radius: 16px;
+  color: var(--menu-text);
+  background: rgba(255,255,255,.75);
+  outline: none;
+}
+
+body.dark-menu .field input,
+body.dark-menu .field select {
+  color: #fff;
+  background: rgba(255,255,255,.08);
+  border-color: rgba(255,255,255,.1);
+}
+
+.row-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.04);
+}
+
+body.dark-menu .row-field {
+  background: rgba(255,255,255,.07);
+}
+
+.row-field > span {
+  margin: 0;
+}
+
+.row-field input {
+  width: 22px;
+  min-height: auto;
+  height: 22px;
+  accent-color: var(--accent);
+}
+
+.theme-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.theme-choice {
+  height: 74px;
+  border-radius: 18px;
+  border: 2px solid transparent;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.18), 0 12px 24px rgba(0,0,0,.12);
+}
+
+.theme-choice.active {
+  border-color: #fff;
+  outline: 3px solid var(--accent);
+}
+
+.primary-btn,
+.secondary-btn,
+.danger-btn {
+  width: 100%;
+  min-height: 54px;
+  border-radius: 17px;
+  font-weight: 950;
+  margin-top: 8px;
+}
+
+.primary-btn {
+  color: #fff;
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  box-shadow: 0 16px 34px rgba(255, 77, 141, .26);
+}
+
+.secondary-btn {
+  color: var(--menu-text);
+  background: rgba(0,0,0,.06);
+}
+
+body.dark-menu .secondary-btn {
+  background: rgba(255,255,255,.1);
+}
+
+.danger-btn {
+  color: #fff;
+  background: #ff315f;
+}
+
+.manage-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.manage-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(0,0,0,.05);
+}
+
+body.dark-menu .manage-item {
+  background: rgba(255,255,255,.08);
+}
+
+.manage-item b {
+  display: block;
+  font-size: 13px;
+}
+
+.manage-item small {
+  display: block;
+  color: var(--menu-muted);
+  margin-top: 3px;
+}
+
+.delete-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 13px;
+  color: #fff;
+  background: #ff315f;
+  font-weight: 950;
+}
+
+.info-box {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(0,0,0,.05);
+  margin-bottom: 12px;
+}
+
+body.dark-menu .info-box {
+  background: rgba(255,255,255,.08);
+}
+
+.info-box p {
+  margin: 6px 0 0;
+  color: var(--menu-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: calc(18px + var(--safe-bottom));
+  z-index: 100;
+  max-width: min(360px, calc(100% - 32px));
+  padding: 12px 14px;
+  border-radius: 999px;
+  color: white;
+  background: rgba(16, 8, 28, .9);
+  border: 1px solid rgba(255,255,255,.14);
+  box-shadow: 0 18px 46px rgba(0,0,0,.34);
+  backdrop-filter: blur(18px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 12px);
+  transition: opacity .22s ease, transform .22s ease;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.reveal {
+  animation: reveal .42s ease both;
+}
+
+.delay-1 { animation-delay: .05s; }
+.delay-2 { animation-delay: .1s; }
+.delay-3 { animation-delay: .15s; }
+
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 360px) {
+  .app {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .avatar {
+    width: 78px;
+    height: 78px;
+  }
+
+  .brand-text {
+    display: none;
+  }
+
+  .section-head h2 {
+    font-size: 18px;
+  }
+
+  .tabs {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="app-bg" id="appBg"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <main class="app" id="app">
+    <header class="topbar">
+      <button class="icon-btn" id="settingsBtn" type="button" aria-label="Открыть настройки">
+        <span>⚙️</span>
+      </button>
+      <div class="brand">
+        <span class="brand-mark">LW</span>
+        <span class="brand-text">Love Widget</span>
+      </div>
+      <button class="icon-btn" id="shareBtn" type="button" aria-label="Поделиться виджетом">
+        <span>💌</span>
+      </button>
+    </header>
+
+    <section class="hero-card glass reveal">
+      <div class="avatars">
+        <button class="avatar-wrap" type="button" data-upload="person1" aria-label="Изменить первое фото">
+          <span class="avatar" id="avatar1"></span>
+          <span class="avatar-label" id="avatarName1">Ты</span>
+        </button>
+
+        <div class="heart-core" aria-hidden="true">
+          <span>❤</span>
+        </div>
+
+        <button class="avatar-wrap" type="button" data-upload="person2" aria-label="Изменить второе фото">
+          <span class="avatar" id="avatar2"></span>
+          <span class="avatar-label" id="avatarName2">Половинка</span>
+        </button>
+      </div>
+
+      <div class="couple-title" id="coupleTitle">Ты + Половинка</div>
+      <div class="date-line" id="dateLine">Дата отношений не настроена</div>
+    </section>
+
+    <section class="days-card glass reveal delay-1">
+      <div class="card-kicker">Мы вместе</div>
+      <div class="days-number" id="daysNumber">0</div>
+      <div class="days-label" id="daysLabel">дней</div>
+      <div class="mini-stats">
+        <div>
+          <span id="yearsTogether">0</span>
+          <small>лет</small>
+        </div>
+        <div>
+          <span id="monthsTogether">0</span>
+          <small>мес.</small>
+        </div>
+        <div>
+          <span id="nextDays">0</span>
+          <small>до события</small>
+        </div>
+      </div>
+    </section>
+
+    <section class="next-card glass reveal delay-2" id="nextCard">
+      <div class="section-head">
+        <div>
+          <div class="section-kicker">Ближайшее</div>
+          <h2 id="nextTitle">Добавь дату</h2>
+        </div>
+        <span class="pill" id="nextBadge">0 дн.</span>
+      </div>
+      <div class="progress">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <p id="nextText">Укажи дату начала отношений, чтобы виджет построил ленту событий.</p>
+    </section>
+
+    <section class="timeline-section reveal delay-3">
+      <div class="section-head compact">
+        <div>
+          <div class="section-kicker">Лента</div>
+          <h2>События пары</h2>
+        </div>
+        <button class="small-btn" id="addEventQuickBtn" type="button">+ событие</button>
+      </div>
+
+      <div class="filters" role="tablist" aria-label="Фильтр событий">
+        <button class="filter active" type="button" data-filter="next">Ближайшие</button>
+        <button class="filter" type="button" data-filter="all">Все</button>
+        <button class="filter" type="button" data-filter="past">Прошедшие</button>
+      </div>
+
+      <div class="timeline" id="timeline"></div>
+      <div class="empty-state hidden" id="emptyState">
+        <div>🗓️</div>
+        <p>Пока нет событий для выбранного фильтра.</p>
+      </div>
+    </section>
+  </main>
+
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <div class="drawer-panel" role="dialog" aria-modal="true" aria-label="Настройки виджета">
+      <div class="drawer-handle"></div>
+      <div class="drawer-head">
+        <div>
+          <div class="section-kicker">Настройки</div>
+          <h2>Твой виджет</h2>
+        </div>
+        <button class="icon-btn dark" id="closeDrawerBtn" type="button" aria-label="Закрыть настройки">✕</button>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="Разделы настроек">
+        <button class="tab active" type="button" data-tab="profile">Профиль</button>
+        <button class="tab" type="button" data-tab="style">Стиль</button>
+        <button class="tab" type="button" data-tab="events">События</button>
+        <button class="tab" type="button" data-tab="data">Данные</button>
+      </div>
+
+      <form class="tab-panel active" id="profilePanel" data-panel="profile">
+        <label class="field">
+          <span>Твоё имя</span>
+          <input id="name1Input" type="text" maxlength="24" placeholder="Ты" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Имя половинки</span>
+          <input id="name2Input" type="text" maxlength="24" placeholder="Половинка" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Дата начала отношений</span>
+          <input id="dateInput" type="date" />
+          <small id="dateHelp">Можно выбрать дату не старше 80 лет и не позже сегодняшнего дня.</small>
+        </label>
+        <button class="primary-btn" id="saveProfileBtn" type="submit">Сохранить профиль</button>
+      </form>
+
+      <div class="tab-panel" data-panel="style">
+        <div class="field">
+          <span>Готовые фоны</span>
+          <div class="theme-grid" id="themeGrid"></div>
+        </div>
+        <label class="field">
+          <span>Акцентный цвет</span>
+          <input id="accentInput" type="color" />
+        </label>
+        <label class="field row-field">
+          <span>Тёмное меню</span>
+          <input id="darkUiInput" type="checkbox" />
+        </label>
+        <button class="primary-btn" id="saveStyleBtn" type="button">Применить стиль</button>
+      </div>
+
+      <div class="tab-panel" data-panel="events">
+        <label class="field">
+          <span>Название события</span>
+          <input id="eventNameInput" type="text" maxlength="40" placeholder="Первое свидание" autocomplete="off" />
+        </label>
+        <label class="field">
+          <span>Дата события</span>
+          <input id="eventDateInput" type="date" />
+        </label>
+        <button class="primary-btn" id="addEventBtn" type="button">Добавить событие</button>
+        <div class="manage-list" id="manageEvents"></div>
+      </div>
+
+      <div class="tab-panel" data-panel="data">
+        <div class="info-box">
+          <b>Хранение данных</b>
+          <p>Эта версия Mini App хранит настройки в браузере Telegram через localStorage. Для общего альбома и синхронизации между двумя людьми нужен backend или обработка WebAppData в боте.</p>
+        </div>
+        <button class="secondary-btn" id="exportBtn" type="button">Экспортировать JSON</button>
+        <button class="secondary-btn" id="importBtn" type="button">Импортировать JSON</button>
+        <button class="danger-btn" id="resetBtn" type="button">Сбросить виджет</button>
+      </div>
+    </div>
+  </aside>
+
+  <input class="hidden-input" id="avatar1Input" type="file" accept="image/*" />
+  <input class="hidden-input" id="avatar2Input" type="file" accept="image/*" />
+  <input class="hidden-input" id="importFileInput" type="file" accept="application/json,.json" />
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script>
+(() => {
+  'use strict';
+
+  const STORAGE_KEY = 'lw_love_widget_v2';
+  const LEGACY_STORAGE_KEY = 'love_final_v100_stable';
+  const MAX_RELATIONSHIP_YEARS = 80;
+  const MAX_EVENTS = 80;
+  const MAX_IMAGE_SIZE = 3 * 1024 * 1024;
+
+  const tg = window.Telegram?.WebApp || null;
+
+  const themes = [
+    {
+      id: 'love',
+      name: 'Love',
+      bg: 'linear-gradient(135deg, #ff4d8d 0%, #7c3cff 42%, #121632 68%, #4df3ff 100%)',
+      accent: '#ff4d8d',
+      accent2: '#7c3cff'
+    },
+    {
+      id: 'sunset',
+      name: 'Sunset',
+      bg: 'linear-gradient(135deg, #ff8a00 0%, #ff3d77 46%, #5218d2 100%)',
+      accent: '#ff5a7a',
+      accent2: '#ff9f1c'
+    },
+    {
+      id: 'ocean',
+      name: 'Ocean',
+      bg: 'linear-gradient(135deg, #041b33 0%, #006d77 46%, #83c5be 100%)',
+      accent: '#4df3ff',
+      accent2: '#3a86ff'
+    },
+    {
+      id: 'berry',
+      name: 'Berry',
+      bg: 'linear-gradient(135deg, #390099 0%, #9e0059 48%, #ff0054 100%)',
+      accent: '#ff0054',
+      accent2: '#8338ec'
+    },
+    {
+      id: 'midnight',
+      name: 'Midnight',
+      bg: 'linear-gradient(135deg, #020617 0%, #312e81 50%, #0f172a 100%)',
+      accent: '#8b5cf6',
+      accent2: '#06b6d4'
+    },
+    {
+      id: 'rose',
+      name: 'Rose',
+      bg: 'linear-gradient(135deg, #3a0f1f 0%, #8f2d56 50%, #ffb3c1 100%)',
+      accent: '#ff4d6d',
+      accent2: '#c9184a'
+    }
+  ];
+
+  const defaults = {
+    version: 2,
+    names: {
+      person1: 'Ты',
+      person2: 'Половинка'
+    },
+    relationshipDate: todayInputValue(),
+    avatars: {
+      person1: '',
+      person2: ''
+    },
+    style: {
+      themeId: 'love',
+      bg: themes[0].bg,
+      accent: themes[0].accent,
+      accent2: themes[0].accent2,
+      darkMenu: false
+    },
+    customEvents: []
+  };
+
+  const els = {};
+  let state = loadState();
+  let activeFilter = 'next';
+  let toastTimer = null;
+
+  document.addEventListener('DOMContentLoaded', init);
+
+  function init() {
+    cacheElements();
+    setupTelegram();
+    setupLimits();
+    renderThemeChoices();
+    bindEvents();
+    fillForm();
+    render();
+  }
+
+  function cacheElements() {
+    const ids = [
+      'appBg', 'settingsBtn', 'shareBtn', 'avatar1', 'avatar2', 'avatarName1', 'avatarName2',
+      'coupleTitle', 'dateLine', 'daysNumber', 'daysLabel', 'yearsTogether', 'monthsTogether',
+      'nextDays', 'nextTitle', 'nextBadge', 'nextText', 'progressBar', 'timeline', 'emptyState',
+      'drawer', 'drawerBackdrop', 'closeDrawerBtn', 'name1Input', 'name2Input', 'dateInput',
+      'dateHelp', 'accentInput', 'darkUiInput', 'themeGrid', 'saveProfileBtn', 'saveStyleBtn',
+      'eventNameInput', 'eventDateInput', 'addEventBtn', 'addEventQuickBtn', 'manageEvents',
+      'avatar1Input', 'avatar2Input', 'exportBtn', 'importBtn', 'importFileInput', 'resetBtn', 'toast'
+    ];
+
+    ids.forEach((id) => {
+      els[id] = document.getElementById(id);
+    });
+  }
+
+  function setupTelegram() {
+    if (!tg) return;
+
+    try {
+      tg.ready();
+      tg.expand();
+      tg.disableVerticalSwipes?.();
+      tg.setHeaderColor?.('#12061f');
+      tg.setBackgroundColor?.('#07020d');
+
+      const user = tg.initDataUnsafe?.user;
+      if (user?.first_name && state.names.person1 === defaults.names.person1) {
+        state.names.person1 = String(user.first_name).slice(0, 24);
+        saveState(false);
+      }
+    } catch (error) {
+      console.warn('Telegram WebApp init error:', error);
+    }
+  }
+
+  function setupLimits() {
+    const today = todayInputValue();
+    const minDate = addYears(new Date(), -MAX_RELATIONSHIP_YEARS);
+    els.dateInput.max = today;
+    els.dateInput.min = toInputDate(minDate);
+    els.eventDateInput.min = '1900-01-01';
+    els.eventDateInput.max = '2100-12-31';
+  }
+
+  function bindEvents() {
+    els.settingsBtn.addEventListener('click', () => openDrawer('profile'));
+    els.closeDrawerBtn.addEventListener('click', closeDrawer);
+    els.drawerBackdrop.addEventListener('click', closeDrawer);
+    els.shareBtn.addEventListener('click', shareWidget);
+    els.addEventQuickBtn.addEventListener('click', () => openDrawer('events'));
+
+    document.querySelectorAll('[data-upload]').forEach((button) => {
+      button.addEventListener('click', () => {
+        haptic('light');
+        const target = button.dataset.upload;
+        if (target === 'person1') els.avatar1Input.click();
+        if (target === 'person2') els.avatar2Input.click();
+      });
+    });
+
+    els.avatar1Input.addEventListener('change', (event) => handleAvatarUpload(event, 'person1'));
+    els.avatar2Input.addEventListener('change', (event) => handleAvatarUpload(event, 'person2'));
+
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+    });
+
+    document.querySelectorAll('.filter').forEach((button) => {
+      button.addEventListener('click', () => {
+        activeFilter = button.dataset.filter;
+        document.querySelectorAll('.filter').forEach((item) => item.classList.toggle('active', item === button));
+        renderTimeline();
+        haptic('light');
+      });
+    });
+
+    document.getElementById('profilePanel').addEventListener('submit', (event) => {
+      event.preventDefault();
+      saveProfile();
+    });
+
+    els.saveStyleBtn.addEventListener('click', saveStyle);
+    els.addEventBtn.addEventListener('click', addCustomEvent);
+    els.exportBtn.addEventListener('click', exportData);
+    els.importBtn.addEventListener('click', () => els.importFileInput.click());
+    els.importFileInput.addEventListener('change', importData);
+    els.resetBtn.addEventListener('click', resetWidget);
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') closeDrawer();
+    });
+  }
+
+  function openDrawer(tab = 'profile') {
+    fillForm();
+    switchTab(tab);
+    els.drawer.classList.add('open');
+    els.drawer.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    haptic('light');
+  }
+
+  function closeDrawer() {
+    els.drawer.classList.remove('open');
+    els.drawer.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  function switchTab(tabName) {
+    document.querySelectorAll('.tab').forEach((tab) => {
+      tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+
+    document.querySelectorAll('.tab-panel').forEach((panel) => {
+      panel.classList.toggle('active', panel.dataset.panel === tabName);
+    });
+
+    if (tabName === 'events') renderManageEvents();
+  }
+
+  function loadState() {
+    const loaded = readJson(STORAGE_KEY);
+    if (loaded) return normalizeState(loaded);
+
+    const legacy = readJson(LEGACY_STORAGE_KEY);
+    if (legacy) {
+      const migrated = migrateLegacy(legacy);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+      return migrated;
+    }
+
+    return structuredCloneSafe(defaults);
+  }
+
+  function readJson(key) {
+    try {
+      const raw = localStorage.getItem(key);
+      if (!raw) return null;
+      return JSON.parse(raw);
+    } catch (error) {
+      console.warn(`Broken localStorage key ${key}:`, error);
+      return null;
+    }
+  }
+
+  function migrateLegacy(legacy) {
+    return normalizeState({
+      version: 2,
+      names: {
+        person1: legacy.n1 || defaults.names.person1,
+        person2: legacy.n2 || defaults.names.person2
+      },
+      relationshipDate: legacy.date || defaults.relationshipDate,
+      avatars: {
+        person1: legacy.pic1 || '',
+        person2: legacy.pic2 || ''
+      },
+      style: {
+        themeId: 'love',
+        bg: legacy.bg || defaults.style.bg,
+        accent: defaults.style.accent,
+        accent2: defaults.style.accent2,
+        darkMenu: legacy.ui === 'dark'
+      },
+      customEvents: Array.isArray(legacy.custom)
+        ? legacy.custom.map((item) => ({ title: item.n, date: item.d, id: cryptoId() }))
+        : []
+    });
+  }
+
+  function normalizeState(value) {
+    const next = structuredCloneSafe(defaults);
+    next.version = 2;
+
+    if (value?.names) {
+      next.names.person1 = cleanText(value.names.person1, defaults.names.person1, 24);
+      next.names.person2 = cleanText(value.names.person2, defaults.names.person2, 24);
+    }
+
+    if (isValidDateInput(value?.relationshipDate)) {
+      next.relationshipDate = clampRelationshipDate(value.relationshipDate);
+    }
+
+    if (value?.avatars) {
+      next.avatars.person1 = typeof value.avatars.person1 === 'string' ? value.avatars.person1 : '';
+      next.avatars.person2 = typeof value.avatars.person2 === 'string' ? value.avatars.person2 : '';
+    }
+
+    if (value?.style) {
+      next.style.themeId = typeof value.style.themeId === 'string' ? value.style.themeId : defaults.style.themeId;
+      next.style.bg = typeof value.style.bg === 'string' ? value.style.bg : defaults.style.bg;
+      next.style.accent = isColor(value.style.accent) ? value.style.accent : defaults.style.accent;
+      next.style.accent2 = isColor(value.style.accent2) ? value.style.accent2 : defaults.style.accent2;
+      next.style.darkMenu = Boolean(value.style.darkMenu);
+    }
+
+    if (Array.isArray(value?.customEvents)) {
+      next.customEvents = value.customEvents
+        .filter((event) => event && isValidDateInput(event.date))
+        .slice(0, MAX_EVENTS)
+        .map((event) => ({
+          id: event.id || cryptoId(),
+          title: cleanText(event.title || event.n, 'Событие', 40),
+          date: event.date
+        }));
+    }
+
+    return next;
+  }
+
+  function saveState(showSaved = true) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      if (showSaved) showToast('Сохранено');
+    } catch (error) {
+      console.error('Save error:', error);
+      showToast('Не удалось сохранить. Возможно, память браузера заполнена.');
+    }
+  }
+
+  function saveProfile() {
+    state.names.person1 = cleanText(els.name1Input.value, defaults.names.person1, 24);
+    state.names.person2 = cleanText(els.name2Input.value, defaults.names.person2, 24);
+
+    const selectedDate = els.dateInput.value;
+    if (!isValidDateInput(selectedDate)) {
+      showToast('Укажи корректную дату');
+      return;
+    }
+
+    const clamped = clampRelationshipDate(selectedDate);
+    if (clamped !== selectedDate) {
+      els.dateInput.value = clamped;
+      showToast('Дата была ограничена допустимым диапазоном');
+    }
+
+    state.relationshipDate = clamped;
+    saveState();
+    render();
+    closeDrawer();
+    haptic('success');
+  }
+
+  function saveStyle() {
+    state.style.accent = els.accentInput.value || defaults.style.accent;
+    state.style.darkMenu = els.darkUiInput.checked;
+    saveState();
+    render();
+    haptic('success');
+  }
+
+  function addCustomEvent() {
+    const title = cleanText(els.eventNameInput.value, '', 40);
+    const date = els.eventDateInput.value;
+
+    if (!title) {
+      showToast('Напиши название события');
+      return;
+    }
+
+    if (!isValidDateInput(date)) {
+      showToast('Укажи корректную дату события');
+      return;
+    }
+
+    if (state.customEvents.length >= MAX_EVENTS) {
+      showToast(`Максимум событий: ${MAX_EVENTS}`);
+      return;
+    }
+
+    state.customEvents.push({ id: cryptoId(), title, date });
+    els.eventNameInput.value = '';
+    els.eventDateInput.value = '';
+    saveState();
+    render();
+    renderManageEvents();
+    haptic('success');
+  }
+
+  function deleteCustomEvent(id) {
+    state.customEvents = state.customEvents.filter((event) => event.id !== id);
+    saveState();
+    render();
+    renderManageEvents();
+  }
+
+  function saveTheme(themeId) {
+    const theme = themes.find((item) => item.id === themeId);
+    if (!theme) return;
+
+    state.style.themeId = theme.id;
+    state.style.bg = theme.bg;
+    state.style.accent = theme.accent;
+    state.style.accent2 = theme.accent2;
+    els.accentInput.value = theme.accent;
+    saveState(false);
+    renderThemeChoices();
+    render();
+    haptic('light');
+  }
+
+  function render() {
+    applyStyle();
+    renderProfile();
+    renderDays();
+    renderNextCard();
+    renderTimeline();
+  }
+
+  function applyStyle() {
+    const root = document.documentElement;
+    root.style.setProperty('--accent', state.style.accent);
+    root.style.setProperty('--accent-2', state.style.accent2 || state.style.accent);
+    els.appBg.style.background = state.style.bg;
+    document.body.classList.toggle('dark-menu', state.style.darkMenu);
+  }
+
+  function renderProfile() {
+    const n1 = state.names.person1;
+    const n2 = state.names.person2;
+
+    els.avatarName1.textContent = n1;
+    els.avatarName2.textContent = n2;
+    els.coupleTitle.textContent = `${n1} + ${n2}`;
+
+    const date = parseInputDate(state.relationshipDate);
+    els.dateLine.textContent = `С ${formatDate(date)}`;
+
+    setAvatar(els.avatar1, state.avatars.person1, n1);
+    setAvatar(els.avatar2, state.avatars.person2, n2);
+  }
+
+  function setAvatar(element, image, fallbackName) {
+    if (image) {
+      element.style.backgroundImage = `url(${image})`;
+      element.textContent = '';
+      return;
+    }
+
+    element.style.backgroundImage = '';
+    element.textContent = getInitial(fallbackName);
+    element.style.display = 'grid';
+    element.style.placeItems = 'center';
+    element.style.fontSize = '34px';
+    element.style.fontWeight = '950';
+  }
+
+  function renderDays() {
+    const start = parseInputDate(state.relationshipDate);
+    const today = startOfDay(new Date());
+    const totalDays = Math.max(0, diffDays(start, today));
+    const totalMonths = Math.max(0, monthDiff(start, today));
+    const years = Math.floor(totalMonths / 12);
+    const months = totalMonths % 12;
+
+    els.daysNumber.textContent = String(totalDays);
+    els.daysLabel.textContent = pluralRu(totalDays, ['день', 'дня', 'дней']);
+    els.yearsTogether.textContent = String(years);
+    els.monthsTogether.textContent = String(months);
+  }
+
+  function renderNextCard() {
+    const events = buildEvents();
+    const today = startOfDay(new Date());
+    const upcoming = events.filter((event) => event.dateObj >= today);
+    const next = upcoming[0];
+
+    if (!next) {
+      els.nextTitle.textContent = 'Все события пройдены';
+      els.nextBadge.textContent = 'готово';
+      els.nextText.textContent = 'Можно добавить своё событие в настройках.';
+      els.nextDays.textContent = '0';
+      els.progressBar.style.width = '100%';
+      return;
+    }
+
+    const daysLeft = Math.max(0, diffDays(today, next.dateObj));
+    const previous = findPreviousEvent(events, next.dateObj);
+    const totalRange = previous ? Math.max(1, diffDays(previous.dateObj, next.dateObj)) : Math.max(1, diffDays(parseInputDate(state.relationshipDate), next.dateObj));
+    const passed = previous ? Math.max(0, diffDays(previous.dateObj, today)) : Math.max(0, diffDays(parseInputDate(state.relationshipDate), today));
+    const progress = clamp((passed / totalRange) * 100, 0, 100);
+
+    els.nextTitle.textContent = next.title;
+    els.nextBadge.textContent = daysLeft === 0 ? 'сегодня' : `${daysLeft} ${pluralRu(daysLeft, ['день', 'дня', 'дней'])}`;
+    els.nextText.textContent = `${formatDate(next.dateObj)}. Осталось ${daysLeft} ${pluralRu(daysLeft, ['день', 'дня', 'дней'])}.`;
+    els.nextDays.textContent = String(daysLeft);
+    els.progressBar.style.width = `${progress}%`;
+  }
+
+  function renderTimeline() {
+    const today = startOfDay(new Date());
+    let events = buildEvents();
+
+    if (activeFilter === 'next') {
+      events = events.filter((event) => event.dateObj >= today).slice(0, 12);
+    } else if (activeFilter === 'past') {
+      events = events.filter((event) => event.dateObj < today).reverse().slice(0, 12);
+    } else {
+      events = events.slice(0, 80);
+    }
+
+    els.timeline.replaceChildren();
+    els.emptyState.classList.toggle('hidden', events.length > 0);
+
+    const fragment = document.createDocumentFragment();
+    events.forEach((event) => fragment.appendChild(createEventCard(event, today)));
+    els.timeline.appendChild(fragment);
+  }
+
+  function createEventCard(event, today) {
+    const card = document.createElement('article');
+    const days = diffDays(today, event.dateObj);
+    const isPast = days < 0;
+
+    card.className = `event-card ${isPast ? 'past' : ''}`;
+
+    const icon = document.createElement('div');
+    icon.className = 'event-icon';
+    icon.textContent = event.icon || '💗';
+
+    const content = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'event-title';
+    title.textContent = event.title;
+
+    const date = document.createElement('div');
+    date.className = 'event-date';
+    date.textContent = formatDate(event.dateObj);
+
+    content.append(title, date);
+
+    const count = document.createElement('div');
+    count.className = 'event-count';
+    if (days === 0) count.textContent = 'сегодня';
+    else if (isPast) count.textContent = '✅';
+    else count.textContent = `${days} дн.`;
+
+    card.append(icon, content, count);
+    return card;
+  }
+
+  function renderManageEvents() {
+    els.manageEvents.replaceChildren();
+
+    if (!state.customEvents.length) {
+      const box = document.createElement('div');
+      box.className = 'info-box';
+      box.innerHTML = '<b>Своих событий пока нет</b><p>Добавь годовщину, первое свидание или любую важную дату.</p>';
+      els.manageEvents.appendChild(box);
+      return;
+    }
+
+    const sorted = [...state.customEvents].sort((a, b) => parseInputDate(a.date) - parseInputDate(b.date));
+    const fragment = document.createDocumentFragment();
+
+    sorted.forEach((event) => {
+      const item = document.createElement('div');
+      item.className = 'manage-item';
+
+      const text = document.createElement('div');
+      const title = document.createElement('b');
+      title.textContent = event.title;
+      const date = document.createElement('small');
+      date.textContent = formatDate(parseInputDate(event.date));
+      text.append(title, date);
+
+      const button = document.createElement('button');
+      button.className = 'delete-btn';
+      button.type = 'button';
+      button.textContent = '×';
+      button.setAttribute('aria-label', `Удалить событие ${event.title}`);
+      button.addEventListener('click', () => deleteCustomEvent(event.id));
+
+      item.append(text, button);
+      fragment.appendChild(item);
+    });
+
+    els.manageEvents.appendChild(fragment);
+  }
+
+  function renderThemeChoices() {
+    els.themeGrid.replaceChildren();
+
+    themes.forEach((theme) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `theme-choice ${state.style.themeId === theme.id ? 'active' : ''}`;
+      button.style.background = theme.bg;
+      button.title = theme.name;
+      button.setAttribute('aria-label', `Выбрать фон ${theme.name}`);
+      button.addEventListener('click', () => saveTheme(theme.id));
+      els.themeGrid.appendChild(button);
+    });
+  }
+
+  function fillForm() {
+    els.name1Input.value = state.names.person1;
+    els.name2Input.value = state.names.person2;
+    els.dateInput.value = state.relationshipDate;
+    els.accentInput.value = state.style.accent;
+    els.darkUiInput.checked = state.style.darkMenu;
+  }
+
+  function buildEvents() {
+    const start = parseInputDate(state.relationshipDate);
+    const events = [];
+
+    for (let month = 1; month <= 120; month += 1) {
+      const eventDate = addMonths(start, month);
+
+      if (month < 12) {
+        events.push({
+          title: `${month} ${pluralRu(month, ['месяц', 'месяца', 'месяцев'])} вместе`,
+          dateObj: eventDate,
+          icon: '✨',
+          type: 'auto'
+        });
+      } else if (month % 6 === 0) {
+        const years = Math.floor(month / 12);
+        const isYear = month % 12 === 0;
+        events.push({
+          title: isYear
+            ? `${years} ${pluralRu(years, ['год', 'года', 'лет'])} вместе`
+            : `${years} г. и 6 мес. вместе`,
+          dateObj: eventDate,
+          icon: isYear ? '💎' : '⚡️',
+          type: 'auto'
+        });
+      }
+    }
+
+    state.customEvents.forEach((event) => {
+      events.push({
+        title: event.title,
+        dateObj: parseInputDate(event.date),
+        icon: '💌',
+        type: 'custom',
+        id: event.id
+      });
+    });
+
+    return events.sort((a, b) => a.dateObj - b.dateObj);
+  }
+
+  function findPreviousEvent(events, dateObj) {
+    let previous = null;
+    for (const event of events) {
+      if (event.dateObj < dateObj) previous = event;
+      else break;
+    }
+    return previous;
+  }
+
+  async function handleAvatarUpload(event, personKey) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Можно загрузить только изображение');
+      return;
+    }
+
+    if (file.size > MAX_IMAGE_SIZE) {
+      showToast('Фото слишком большое. Максимум 3 МБ.');
+      return;
+    }
+
+    try {
+      const dataUrl = await compressImage(file, 640, 0.86);
+      state.avatars[personKey] = dataUrl;
+      saveState();
+      renderProfile();
+      haptic('success');
+    } catch (error) {
+      console.error('Avatar upload error:', error);
+      showToast('Не удалось загрузить фото');
+    }
+  }
+
+  function compressImage(file, size, quality) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onerror = () => reject(new Error('File read failed'));
+      reader.onload = () => {
+        const image = new Image();
+        image.onerror = () => reject(new Error('Image load failed'));
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          const side = Math.min(image.width, image.height);
+          canvas.width = size;
+          canvas.height = size;
+
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(
+            image,
+            Math.floor((image.width - side) / 2),
+            Math.floor((image.height - side) / 2),
+            side,
+            side,
+            0,
+            0,
+            size,
+            size
+          );
+
+          resolve(canvas.toDataURL('image/jpeg', quality));
+        };
+        image.src = reader.result;
+      };
+
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function shareWidget() {
+    const days = Math.max(0, diffDays(parseInputDate(state.relationshipDate), startOfDay(new Date())));
+    const text = `${state.names.person1} + ${state.names.person2}: ${days} ${pluralRu(days, ['день', 'дня', 'дней'])} вместе 💗`;
+
+    if (navigator.share) {
+      navigator.share({ title: 'LW - Love Widget', text }).catch(() => {});
+      return;
+    }
+
+    copyText(text);
+  }
+
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('Текст скопирован');
+    } catch {
+      showToast(text);
+    }
+  }
+
+  function exportData() {
+    const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `lw-love-widget-${todayInputValue()}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    showToast('JSON экспортирован');
+  }
+
+  function importData(event) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onerror = () => showToast('Не удалось прочитать файл');
+    reader.onload = () => {
+      try {
+        const imported = JSON.parse(String(reader.result || ''));
+        state = normalizeState(imported);
+        saveState();
+        fillForm();
+        renderThemeChoices();
+        render();
+        showToast('Данные импортированы');
+      } catch {
+        showToast('Файл JSON некорректный');
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function resetWidget() {
+    const ok = confirm('Сбросить все настройки Mini App?');
+    if (!ok) return;
+
+    state = structuredCloneSafe(defaults);
+    saveState();
+    fillForm();
+    renderThemeChoices();
+    render();
+    showToast('Виджет сброшен');
+  }
+
+  function showToast(message) {
+    els.toast.textContent = message;
+    els.toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => els.toast.classList.remove('show'), 2300);
+  }
+
+  function haptic(type = 'light') {
+    try {
+      if (!tg?.HapticFeedback) return;
+      if (type === 'success') tg.HapticFeedback.notificationOccurred('success');
+      else tg.HapticFeedback.impactOccurred(type);
+    } catch {}
+  }
+
+  function cleanText(value, fallback, maxLength) {
+    const text = String(value || '').replace(/\s+/g, ' ').trim();
+    return (text || fallback).slice(0, maxLength);
+  }
+
+  function isColor(value) {
+    return typeof value === 'string' && /^#[0-9a-f]{6}$/i.test(value);
+  }
+
+  function getInitial(name) {
+    return cleanText(name, '❤', 2).charAt(0).toUpperCase();
+  }
+
+  function isValidDateInput(value) {
+    return typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(parseInputDate(value).getTime());
+  }
+
+  function clampRelationshipDate(value) {
+    const date = parseInputDate(value);
+    const today = startOfDay(new Date());
+    const min = startOfDay(addYears(today, -MAX_RELATIONSHIP_YEARS));
+    const clamped = new Date(clamp(date.getTime(), min.getTime(), today.getTime()));
+    return toInputDate(clamped);
+  }
+
+  function parseInputDate(value) {
+    const [year, month, day] = String(value).split('-').map(Number);
+    return startOfDay(new Date(year, month - 1, day));
+  }
+
+  function toInputDate(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  }
+
+  function todayInputValue() {
+    return toInputDate(new Date());
+  }
+
+  function startOfDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function addYears(date, years) {
+    const result = new Date(date);
+    result.setFullYear(result.getFullYear() + years);
+    return result;
+  }
+
+  function addMonths(date, months) {
+    const result = new Date(date);
+    const originalDay = result.getDate();
+    result.setDate(1);
+    result.setMonth(result.getMonth() + months);
+    const lastDay = new Date(result.getFullYear(), result.getMonth() + 1, 0).getDate();
+    result.setDate(Math.min(originalDay, lastDay));
+    return startOfDay(result);
+  }
+
+  function diffDays(from, to) {
+    return Math.round((startOfDay(to) - startOfDay(from)) / 86400000);
+  }
+
+  function monthDiff(from, to) {
+    let months = (to.getFullYear() - from.getFullYear()) * 12 + (to.getMonth() - from.getMonth());
+    if (to.getDate() < from.getDate()) months -= 1;
+    return months;
+  }
+
+  function formatDate(date) {
+    return new Intl.DateTimeFormat('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(date);
+  }
+
+  function pluralRu(number, forms) {
+    const n = Math.abs(number) % 100;
+    const n1 = n % 10;
+    if (n > 10 && n < 20) return forms[2];
+    if (n1 > 1 && n1 < 5) return forms[1];
+    if (n1 === 1) return forms[0];
+    return forms[2];
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(Math.max(value, min), max);
+  }
+
+  function cryptoId() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    return `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+  }
+
+  function structuredCloneSafe(value) {
+    if (window.structuredClone) return window.structuredClone(value);
+    return JSON.parse(JSON.stringify(value));
+  }
+})();
+
+  </script>
+</body>
+</html>
