@@ -10,5 +10,17 @@ html,body{margin:0;min-height:100%;background:#07060d;color:#fff;font-family:Int
 </head>
 <body><main class="box"><div class="logo">LW</div><b>Подключаем Love Widget</b><div class="spin"></div><div class="muted">Синхронизация с вашей общей историей…</div><div id="err" class="err">Не удалось получить адрес LW API. Проверь, что ngrok запущен, затем открой Mini App ещё раз.</div></main>
 <script>
-(async()=>{try{const r=await fetch('./api-config.json?t='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('config');const c=await r.json();const api=String(c.api_url||'').replace(/\/$/,'');if(!/^https:\/\//i.test(api))throw new Error('api');const u=new URL('./index.html',location.href);u.searchParams.set('api',api);u.searchParams.set('v',String(Date.now()));location.replace(u.toString())}catch(e){document.querySelector('.spin').style.display='none';document.getElementById('err').style.display='block'}})();
+(async()=>{try{
+  const telegramHash=location.hash;
+  const r=await fetch('./api-config.json?t='+Date.now(),{cache:'no-store'});
+  if(!r.ok)throw new Error('config');
+  const c=await r.json();
+  const api=String(c.api_url||'').replace(/\/$/,'');
+  if(!/^https:\/\//i.test(api))throw new Error('api');
+  const u=new URL('./index.html',location.href);
+  u.searchParams.set('api',api);
+  u.searchParams.set('v',String(Date.now()));
+  u.hash=telegramHash;
+  location.replace(u.toString());
+}catch(e){document.querySelector('.spin').style.display='none';document.getElementById('err').style.display='block'}})();
 </script></body></html>
